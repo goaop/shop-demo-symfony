@@ -1,0 +1,6 @@
+framework:
+    cache:
+        pools:
+            # Results of #[Cacheable] methods (App\Aspect\CachingAspect), kept for the request
+            aspect.cache:
+                adapter: cache.adapter.array

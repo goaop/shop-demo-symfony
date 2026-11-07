@@ -1,0 +1,19 @@
+# Go! AOP: `bin/console config:dump-reference go_aop` lists every option.
+# The bundle is registered in dev, test, prod and prebuilt (config/bundles.php), not in baseline.
+when@dev: &go_aop
+    go_aop:
+        # src/ without the kernel, which is loaded before the aspect kernel boots anyway
+        include_paths: ['%kernel.project_dir%/src']
+        exclude_paths: ['%kernel.project_dir%/src/Kernel.php']
+
+when@test: *go_aop
+
+# Production weaving: woven classes come from the cache through Composer's class map
+when@prod: *go_aop
+
+# Production weaving with a cache that is built by cache:clear / cache:warmup and trusted completely
+when@prebuilt:
+    go_aop:
+        include_paths: ['%kernel.project_dir%/src']
+        exclude_paths: ['%kernel.project_dir%/src/Kernel.php']
+        features: [PREBUILT_CACHE]

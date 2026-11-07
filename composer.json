@@ -1,0 +1,98 @@
+{
+    "name": "goaop/shop-demo-symfony",
+    "description": "Reference Symfony shop application for Go! AOP 4 and GoAopBundle: aspects as autowired services, and a reproducible benchmark of dev, prod and prebuilt-cache environments",
+    "type": "project",
+    "license": "MIT",
+    "keywords": [
+        "aop",
+        "aspect-oriented-programming",
+        "symfony",
+        "php",
+        "benchmark",
+        "opcache"
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.4",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "goaop/goaop-symfony-bundle": "^4.0",
+        "symfony/console": "8.1.*",
+        "symfony/dotenv": "8.1.*",
+        "symfony/flex": "^2.12",
+        "symfony/framework-bundle": "8.1.*",
+        "symfony/runtime": "8.1.*",
+        "symfony/yaml": "8.1.*"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "symfony/flex": true,
+            "symfony/runtime": true
+        },
+        "bump-after-update": true,
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/",
+            "Lib\\": "lib/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php81": "*",
+        "symfony/polyfill-php82": "*",
+        "symfony/polyfill-php83": "*",
+        "symfony/polyfill-php84": "*"
+    },
+    "scripts": {
+        "pre-autoload-dump": "@php bin/generate.php --if-missing",
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ],
+        "generate": "@php bin/generate.php",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php -S 127.0.0.1:8080 -t public public/index.php"
+        ],
+        "bench": "bash bench/run-all.sh"
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "8.1.*"
+        }
+    },
+    "scripts-descriptions": {
+        "generate": "Regenerate the modules (bin/generate.php [modules=40])",
+        "serve": "Start the built-in web server on http://127.0.0.1:8080/ (APP_ENV selects the environment)",
+        "bench": "Run every benchmark, results in results/"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^13.4.6",
+        "symfony/browser-kit": "8.1.*",
+        "symfony/css-selector": "8.1.*"
+    }
+}

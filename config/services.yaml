@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    # Every class of src/ is a service; aspects (Go\Aop\Aspect) are registered by GoAopBundle's autoconfiguration.
+    # Value objects, attributes and events are not services.
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/Attribute/'
+            - '../src/Domain/'
+            - '../src/Event/'
+            - '../src/Kernel.php'
+            - '../src/Module/*/Model/'

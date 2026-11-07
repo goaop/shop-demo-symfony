@@ -1,0 +1,7 @@
+.git
+.phpunit.cache
+vendor
+var
+lib
+src/Module
+results

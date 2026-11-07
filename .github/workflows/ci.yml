@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: Tests and every environment (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.4', '8.5']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          ini-values: opcache.enable_cli=1, opcache.jit=disable, variables_order=EGPCS
+      - run: composer install --no-interaction --no-progress
+      - run: php bin/phpunit
+      - name: Serve one request in every environment
+        run: |
+          for env in baseline dev prod prebuilt; do
+            rm -rf var/cache/$env
+            APP_ENV=$env bin/console cache:clear --quiet
+            APP_ENV=$env php -d variables_order=EGPCS -S 127.0.0.1:8080 -t public public/index.php > /dev/null 2>&1 &
+            for i in $(seq 1 30); do curl -fs -o /dev/null 'http://127.0.0.1:8080/' && break; sleep 0.5; done
+            curl -fs 'http://127.0.0.1:8080/' > response.json
+            kill %1; wait || true
+            php -r '$r = json_decode(file_get_contents("response.json"), true, flags: JSON_THROW_ON_ERROR);
+              $aop = $r["env"] !== "baseline"; $s = $r["response"]["stats"];
+              if ($r["env"] !== $argv[1] || $r["response"]["checkout"]["placed"] !== 47 || $s["audit_records"] !== ($aop ? 800 : 0)) {
+                  fwrite(STDERR, json_encode($r) . "\n"); exit(1);
+              }
+              printf("%-8s %6.1f ms %4d files\n", $r["env"], $r["timing"]["total_ms"], $r["included_files"]);' "$env"
+          done
+
+  docker:
+    name: Docker image (prebuilt cache, preload, read-only root file system)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t shop-demo-symfony .
+      - name: Serve requests from a read-only container
+        run: |
+          docker run -d --name shop -p 8080:8080 --read-only --tmpfs /tmp shop-demo-symfony
+          for i in $(seq 1 30); do curl -fs -o /dev/null 'http://127.0.0.1:8080/' && break; sleep 1; done
+          for i in 1 2 3; do
+            curl -fs 'http://127.0.0.1:8080/' | php -r '$r = json_decode(stream_get_contents(STDIN), true, flags: JSON_THROW_ON_ERROR);
+              if ($r["response"]["stats"]["audit_records"] !== 800) { fwrite(STDERR, json_encode($r) . "\n"); exit(1); }
+              printf("%-8s %6.1f ms %4d files\n", $r["env"], $r["timing"]["total_ms"], $r["included_files"]);'
+          done
+          docker logs shop
+
+  benchmark:
+    name: Benchmarks (manual)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+      - name: Install Xdebug, disabled (the profiler runs load it themselves)
+        run: |
+          sudo apt-get install -y php8.5-xdebug || true
+          sudo phpdismod -v 8.5 xdebug || true
+      - run: composer install --no-interaction --no-progress
+      - run: bash bench/run-all.sh
+      - name: Summary
+        run: |
+          {
+            echo '## Benchmark results'; echo
+            for f in wallclock startup; do echo "### $f"; echo '```'; cat "results/$f.txt"; echo '```'; done
+            [ -f results/profiles-comparison.md ] && { echo '### Profiles'; cat results/profiles-comparison.md; }
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: results/
