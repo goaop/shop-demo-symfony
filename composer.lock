@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b3bff72b94eeaf90b3c455f7f2176beb",
+    "content-hash": "b810f77d57069164df72d72a764d1171",
     "packages": [
         {
             "name": "goaop/dissect",
@@ -261,32 +261,32 @@
         },
         {
             "name": "goaop/parser-reflection",
-            "version": "5.2.0",
+            "version": "4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/goaop/parser-reflection.git",
-                "reference": "795105c73dc1452db381a18b5070688afc6acf77"
+                "reference": "ae1fd681b34591b369ecfd58a9b4baf069ee7b8a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/goaop/parser-reflection/zipball/795105c73dc1452db381a18b5070688afc6acf77",
-                "reference": "795105c73dc1452db381a18b5070688afc6acf77",
+                "url": "https://api.github.com/repos/goaop/parser-reflection/zipball/ae1fd681b34591b369ecfd58a9b4baf069ee7b8a",
+                "reference": "ae1fd681b34591b369ecfd58a9b4baf069ee7b8a",
                 "shasum": ""
             },
             "require": {
-                "nikic/php-parser": "^5.9",
-                "php": ">=8.5"
+                "nikic/php-parser": "^5.4",
+                "php": ">=8.4"
             },
             "require-dev": {
                 "phpstan/phpstan": "^2.0",
-                "phpunit/phpunit": "^13.3.1",
-                "rector/rector": "^2.6.7",
+                "phpunit/phpunit": "^11.0.7",
+                "rector/rector": "^2.0",
                 "tracy/tracy": "^2.10"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "5.0-dev"
+                    "dev-master": "4.x-dev"
                 }
             },
             "autoload": {
@@ -313,7 +313,7 @@
             "description": "Provides reflection information, based on raw source",
             "support": {
                 "issues": "https://github.com/goaop/parser-reflection/issues",
-                "source": "https://github.com/goaop/parser-reflection/tree/5.2.0"
+                "source": "https://github.com/goaop/parser-reflection/tree/4.2.0"
             },
             "funding": [
                 {
@@ -321,7 +321,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-11-03T17:35:11+00:00"
+            "time": "2026-11-03T17:32:07+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -5000,5 +5000,8 @@
         "ext-iconv": "*"
     },
     "platform-dev": {},
+    "platform-overrides": {
+        "php": "8.4.1"
+    },
     "plugin-api-version": "2.6.0"
 }
