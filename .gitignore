@@ -13,6 +13,7 @@
 /lib/
 /src/Module/
 /results/
+/response.json
 ###< goaop/shop-demo-symfony ###
 
 ###> phpunit/phpunit ###
